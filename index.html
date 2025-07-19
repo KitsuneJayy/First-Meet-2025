@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SIIT First Meet 2025 Checker</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f0f4f8;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .container {
+      background: #fff;
+      padding: 2rem;
+      border-radius: 16px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      width: 90%;
+      max-width: 420px;
+    }
+
+    h2 {
+      font-size: 1.8rem;
+      margin-bottom: 1rem;
+      color: #2b2d42;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      margin-top: 0.5rem;
+      margin-bottom: 1rem;
+      font-size: 1rem;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      font-size: 1rem;
+      background-color: #2b2d42;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #1a1c30;
+    }
+
+    #result {
+      margin-top: 2rem;
+      text-align: left;
+      font-size: 1rem;
+      color: #333;
+    }
+
+    @media screen and (max-width: 480px) {
+      .container {
+        padding: 1.5rem;
+      }
+      h2 {
+        font-size: 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Check Eligibility</h2>
+    <input type="text" id="studentId" placeholder="Enter Student ID" />
+    <button onclick="checkStudent()">Check</button>
+    <div id="result"></div>
+  </div>
+
+  <script>
+    const csvPath = './SIIT First Meet 2025 Participants Baan - Baan.csv';
+
+    async function checkStudent() {
+      const inputId = document.getElementById('studentId').value.trim();
+      if (!inputId) {
+        document.getElementById('result').innerHTML = `<p style="color:red;">Please enter your Student ID.</p>`;
+        return;
+      }
+
+      try {
+        const res = await fetch(csvPath);
+        const text = await res.text();
+
+        const rows = text.split('\n').map(row => row.split(','));
+        const headers = rows[0].map(h => h.trim().replace(/\r/g, ''));
+        const idIndex = headers.indexOf('Student ID');
+
+        const foundRow = rows.find((row, i) => i !== 0 && row[idIndex].trim() === inputId);
+
+        const resultBox = document.getElementById('result');
+        if (foundRow) {
+          const data = {};
+          headers.forEach((key, i) => data[key] = (foundRow[i] || '').trim());
+
+          resultBox.innerHTML = `
+            <p><strong>Full Name:</strong> ${data["Full Name"]}</p>
+            <p><strong>Nickname:</strong> ${data["Nickname in Eng"]}</p>
+            <p><strong>Group:</strong> ${data["Group"]}</p>
+            <p><strong>Baan:</strong> ${data["Baan"]}</p>
+            <p><strong>Menu:</strong> ${data["Menu"]}</p>
+          `;
+        } else {
+          resultBox.innerHTML = `<p style="color:red;">❌ Student ID not found.</p>`;
+        }
+      } catch (error) {
+        document.getElementById('result').innerHTML = `<p style="color:red;">Failed to load data. Make sure you're running on a local server.</p>`;
+        console.error(error);
+      }
+    }
+  </script>
+</body>
+</html>
