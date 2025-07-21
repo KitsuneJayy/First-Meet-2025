@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SIIT First Meet 2025 Checker</title>
@@ -8,7 +9,11 @@
     body {
       margin: 0;
       font-family: 'Segoe UI', sans-serif;
-      background-color: #f0f4f8;
+      /* background-color: #f0f4f8; */
+      background-image: url('Vinyl_No_Logo.jpg');
+      background-size: cover;         
+      background-position: center;     
+      background-repeat: no-repeat; 
       display: flex;
       justify-content: center;
       align-items: center;
@@ -39,6 +44,7 @@
       font-size: 1rem;
       border-radius: 8px;
       border: 1px solid #ccc;
+      box-sizing: border-box;
     }
 
     button {
@@ -50,6 +56,7 @@
       border: none;
       border-radius: 8px;
       cursor: pointer;
+      box-sizing: border-box;
     }
 
     button:hover {
@@ -63,6 +70,17 @@
       color: #333;
     }
 
+    #qrCode {
+    margin-top: 1rem;
+    display: flex;
+    justify-content: center;
+    }
+
+    #qrCode canvas {
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+
     @media screen and (max-width: 480px) {
       .container {
         padding: 1.5rem;
@@ -71,6 +89,25 @@
         font-size: 1.5rem;
       }
     }
+
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(240, 244, 248, 0.9);
+      z-index: 999;
+      display: none;
+      justify-content: center;
+      align-items: center;
+    }
+
+  .loaderText {
+      font-size: 1.5rem;
+      color: #2b2d42;
+    }
+
   </style>
 </head>
 <body>
@@ -79,48 +116,70 @@
     <input type="text" id="studentId" placeholder="Enter Student ID" />
     <button onclick="checkStudent()">Check</button>
     <div id="result"></div>
+    <div id="loadingOverlay" class="overlay">
+    <div class="loaderText"> Loading...</div>
   </div>
 
   <script>
-    const csvPath = './SIIT First Meet 2025 Participants Baan - Baan.csv';
+    const apiUrl = 'https://script.google.com/macros/s/AKfycbzAN3tOxm7qYgpyB6HPX_BEvboFnnzyKE9viauf5cK3TStGL389lETTqUJxwkg3P5l7/exec';
+    document.getElementById('studentId').addEventListener('keypress', function(event) {
+      if (event.key === 'Enter') {
+        event.preventDefault(); 
+        checkStudent();
+      }
+    });
 
     async function checkStudent() {
       const inputId = document.getElementById('studentId').value.trim();
+      const resultBox = document.getElementById('result');
+      const loadingOverlay = document.getElementById('loadingOverlay');
+      resultBox.innerHTML = '';
+
       if (!inputId) {
-        document.getElementById('result').innerHTML = `<p style="color:red;">Please enter your Student ID.</p>`;
+        resultBox.innerHTML = `<p style="color:red;">Please enter your Student ID.</p>`;
         return;
       }
 
+      loadingOverlay.style.display = 'flex'; 
+
       try {
-        const res = await fetch(csvPath);
-        const text = await res.text();
+        const res = await fetch(`${apiUrl}?id=${encodeURIComponent(inputId)}`);
+        const data = await res.json();
 
-        const rows = text.split('\n').map(row => row.split(','));
-        const headers = rows[0].map(h => h.trim().replace(/\r/g, ''));
-        const idIndex = headers.indexOf('Student ID');
-
-        const foundRow = rows.find((row, i) => i !== 0 && row[idIndex].trim() === inputId);
-
-        const resultBox = document.getElementById('result');
-        if (foundRow) {
-          const data = {};
-          headers.forEach((key, i) => data[key] = (foundRow[i] || '').trim());
-
+        if (data["Student ID"]) {
           resultBox.innerHTML = `
+            <p><strong>ID:</strong> ${data["No."]}</p>
             <p><strong>Full Name:</strong> ${data["Full Name"]}</p>
             <p><strong>Nickname:</strong> ${data["Nickname in Eng"]}</p>
             <p><strong>Group:</strong> ${data["Group"]}</p>
             <p><strong>Baan:</strong> ${data["Baan"]}</p>
-            <p><strong>Menu:</strong> ${data["Menu"]}</p>
+            <p><strong>Lunch:</strong> ${data["Menu"]}</p>
+            <p><strong>QR Code:</strong>
+            <div id="qrCode"></div>
           `;
+          const qrCodeContainer = document.getElementById('qrCode');
+          qrCodeContainer.innerHTML = ''; 
+
+          const canvas = document.createElement('canvas');
+          qrCodeContainer.appendChild(canvas);
+
+          const qrUrl = `${apiUrl}?id=${encodeURIComponent(data["Student ID"])}`;
+          QRCode.toCanvas(canvas, qrUrl, { width: 150 }, function (error) {
+            if (error) console.error(error);
+          });
+
+      
         } else {
           resultBox.innerHTML = `<p style="color:red;">❌ Student ID not found.</p>`;
         }
       } catch (error) {
-        document.getElementById('result').innerHTML = `<p style="color:red;">Failed to load data. Make sure you're running on a local server.</p>`;
+        resultBox.innerHTML = `<p style="color:red;">❌ Failed to load data.</p>`;
         console.error(error);
+      } finally {
+        loadingOverlay.style.display = 'none'; 
       }
     }
+
   </script>
 </body>
 </html>
