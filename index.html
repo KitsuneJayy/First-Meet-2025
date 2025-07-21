@@ -10,7 +10,7 @@
       margin: 0;
       font-family: 'Segoe UI', sans-serif;
       /* background-color: #f0f4f8; */
-      background-image: url('Vinyl.jpg');
+      background-image: url('Vinyl_No_Logo.jpg');
       background-size: cover;         
       background-position: center;     
       background-repeat: no-repeat; 
@@ -121,8 +121,7 @@
   </div>
 
   <script>
-    const apiUrl = 'https://script.google.com/macros/s/AKfycbyg6CUjc7wrXe816pFd8mreQT5KY-mRBqOlpw1Uaw9q4FjyZxC5DU6L5H084s9vOnHD/exec';
-    
+    const apiUrl = 'https://script.google.com/macros/s/AKfycbzAN3tOxm7qYgpyB6HPX_BEvboFnnzyKE9viauf5cK3TStGL389lETTqUJxwkg3P5l7/exec';
     document.getElementById('studentId').addEventListener('keypress', function(event) {
       if (event.key === 'Enter') {
         event.preventDefault(); 
@@ -149,6 +148,7 @@
 
         if (data["Student ID"]) {
           resultBox.innerHTML = `
+            <p><strong>ID:</strong> ${data["No."]}</p>
             <p><strong>Full Name:</strong> ${data["Full Name"]}</p>
             <p><strong>Nickname:</strong> ${data["Nickname in Eng"]}</p>
             <p><strong>Group:</strong> ${data["Group"]}</p>
