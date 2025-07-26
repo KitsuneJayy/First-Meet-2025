@@ -121,7 +121,7 @@
   </div>
 
   <script>
-    const apiUrl = 'https://script.google.com/macros/s/AKfycbzAN3tOxm7qYgpyB6HPX_BEvboFnnzyKE9viauf5cK3TStGL389lETTqUJxwkg3P5l7/exec';
+    const apiUrl = 'https://script.google.com/macros/s/AKfycbzoE6TV4lIUQY2oxFbY-N1OBMlI8F8-OavCyhCv5WbCjjsCLbKok5xTm5Xpm7wmKpAN/exec';
     document.getElementById('studentId').addEventListener('keypress', function(event) {
       if (event.key === 'Enter') {
         event.preventDefault(); 
@@ -154,6 +154,7 @@
             <p><strong>Group:</strong> ${data["Group"]}</p>
             <p><strong>Baan:</strong> ${data["Baan"]}</p>
             <p><strong>Lunch:</strong> ${data["Menu"]}</p>
+            <p><strong>T-Shirt Size:</strong> ${data["T-Shirt Size"]}</p> 
             <p><strong>QR Code:</strong>
             <div id="qrCode"></div>
           `;
